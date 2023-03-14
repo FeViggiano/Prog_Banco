@@ -1,0 +1,76 @@
+import psycopg2
+
+# Classe Usuario
+class Usuario:
+    def __init__(self, login, senha):
+        self.login = login
+        self.senha = senha
+
+# Função que verifica se o usuário existe no banco de dados
+def existe(usuario):
+    # Abre a conexão
+    with psycopg2.connect(
+        host="localhost",
+        port=5432,
+        dbname="20221_pessoal_db_login",
+        user="postgres",
+        password="senha_do_banco"
+    ) as conexao:
+        # Obtem cursor
+        with conexao.cursor() as cursor:
+            # Executa comando
+            cursor.execute("SELECT * FROM tb_usuario WHERE login=%s AND senha=%s", (usuario.login, usuario.senha))
+            # Obtem o resultado
+            result = cursor.fetchone()
+            # Verifica se o resultado é diferente de None, o que indica que o usuário existe na base
+            return result is not None
+
+# Função que insere um novo usuário no banco de dados
+def insert(usuario):
+    # Abre a conexão
+    with psycopg2.connect(
+        host="localhost",
+        port=5432,
+        dbname="20221_pessoal_db_login",
+        user="postgres",
+        password="senha_do_banco"
+    ) as conexao:
+        # Obtem cursor
+        with conexao.cursor() as cursor:
+            # Executa comando
+            cursor.execute("INSERT INTO tb_usuario (login, senha) VALUES (%s, %s)", (usuario.login, usuario.senha))
+            # Confirma a transação
+            conexao.commit()
+            # Verifica se a transação foi bem sucedida
+            return cursor.rowcount == 1
+
+# Função que exibe o menu
+def menu():
+    # Texto a ser exibido
+    texto = "0-Fechar Sistema\n1-Login\n2-Logoff\n3-Inserir Novo Usuário\n"
+    # Usuario ainda não existe
+    usuario = None
+    # Capturamos a opção do usuário
+    opcao = int(input(texto))
+    # Enquanto ele não digitar zero
+    while opcao != 0:
+        if opcao == 1:
+            login = input("Digite seu login\n")
+            senha = input("Digite sua senha\n")
+            usuario = Usuario(login, senha)
+            # Expressão condicional (if/else de uma linha só)
+            print("Usuário OK!" if existe(usuario) else "Usuário NOK!")
+        elif opcao == 2:
+            usuario = None
+            print("Logoff realizado com sucesso")
+        elif opcao == 3:
+            login = input("Inserir novo login\n")
+            senha = input("Inserir senha\n")
+            novo_usuario = Usuario(login, senha)
+            print("Inserção concluida!" if insert(novo_usuario) else "Inserção falhou!")
+        opcao = int(input(texto))
+    else:
+        print("Até mais")
+
+# Chama a função menu
+menu()
