@@ -1,0 +1,67 @@
+-- calcular o valor de delta
+-- se delta < 0, não há raiz
+-- se delta = 0, não há raiz
+-- se delta > 0, não há raiz
+
+DO $$
+DECLARE
+	valor_a INT := valor_aleatorio_entre (1, 50);
+	valor_b INT := valor_aleatorio_entre (1, 50);
+	valor_c INT := valor_aleatorio_entre (1, 50);
+	delta NUMERIC(10, 2);
+	raiz_um NUMERIC(10, 2);
+	raiz_dois NUMERIC(10, 2);
+
+BEGIN
+	RAISE NOTICE '%x% + %x + % = 0', valor_a, U&'\00B2', valor_b, valor_c;
+	IF valor_a = 0 THEN
+		RAISE NOTICE 'Não é de segundo grau';
+	ELSIF
+		delta < 0 THEN
+		RAISE NOTICE 'Não existe raiz, o delta é %', delta;
+	ELSE
+		delta := valor_b ^ 2 - 4 * valor_a * valor_c;
+		RAISE NOTICE 'Delta: %', delta;
+	END IF;
+END; 
+$$
+
+
+
+DO $$
+DECLARE
+	valor INT := valor_aleatorio_entre(1,100);
+BEGIN
+	RAISE NOTICE 'O valor gerado é: %', valor;
+	IF valor % 2 = 0 THEN
+		RAISE NOTICE '% é par', valor;
+	ELSE
+		RAISE NOTICE '% é impar', valor;
+	END IF;
+END;
+$$
+
+
+DO $$
+DECLARE
+	valor INT;
+BEGIN
+	valor := valor_aleatorio_entre(1,100);
+	RAISE NOTICE 'Valor gerado: %', valor;
+	IF valor <= 20 THEN
+		RAISE NOTICE 'Metade do valor: %', valor / 2::FLOAT;
+	END IF;
+END;
+$$
+
+
+
+
+CREATE OR REPLACE FUNCTION valor_aleatorio_entre(
+	lim_inferior INT, lim_superior INT
+) RETURNS INT AS
+$$
+BEGIN
+	RETURN FLOOR(RANDOM() * (lim_superior - lim_inferior + 1) + lim_inferior) ::INT;
+END;
+$$ LANGUAGE plpgsql
